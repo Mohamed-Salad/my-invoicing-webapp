@@ -1,4 +1,5 @@
-
+import {db} from "@/db"
+import { Invoices } from "@/db/schema"
 import {
   Table,
   TableBody,
@@ -12,7 +13,9 @@ import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
 import {CirclePlus} from 'lucide-react'
 import Link from "next/link"
-export default function Home() {
+export default async function Home() {
+  const results = await db.select().from(Invoices)
+  console.log('results', results)
   return (
       <main className="flex flex-col justify-center h-full text-center gap-6 max-w-5xl mx-auto my-12" >
        <div className="flex justify-between"> 
@@ -50,10 +53,11 @@ export default function Home() {
     </TableRow>
   </TableHeader>
   <TableBody>
-    <TableRow>
+    {results.map(results => {
+      return( <TableRow key= {results.id}>
       <TableCell className="p-4 font-medium text-left">
         <span className="font-semibold">
-          01/11/2025
+        {new Date(results.createTS).toLocaleDateString()}
         </span>
       </TableCell>
       <TableCell className="p-4 text-left">
@@ -68,15 +72,17 @@ export default function Home() {
       </TableCell>
       <TableCell className="p-4 text-center">
         <Badge className="rounded-full">
-          Unpaid
+          {results.status}
         </Badge>
       </TableCell>
       <TableCell className="p-4 text-right">
         <span className="font-semibold">
-          $250.00
+          ${(results.value / 100).toFixed(2)}
         </span>
         </TableCell>
-    </TableRow>
+    </TableRow>)
+    })}
+   
   </TableBody>
 </Table>
         
