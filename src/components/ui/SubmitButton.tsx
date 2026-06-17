@@ -1,22 +1,20 @@
-   "use client";
-   import { useFormStatus } from "react-dom";
-   import { Button } from "@/components/ui/button"
-   import { LoaderCircle } from "lucide-react";
-   const SubmitButton = () => {
-     const { pending } = useFormStatus();
-     console.log(
-      'pending', pending
-     );
-    return(
-    <Button  className=" relative w-full font-semibold">
-          <span className={pending ? 
-            'text-transparent ': ''
-          }>Submit</span>
-          <span className = "flex items-center justify-center w-full h-full absolute text-gray-400">
-          {pending &&
-            <LoaderCircle className="absolute animate-spin" />}
-            </span>
-        </Button>
-    )
-    }
-    export default SubmitButton;
+"use client";
+import { useFormStatus } from "react-dom";
+import { Button } from "@/components/ui/button";
+import { LoaderCircle } from "lucide-react";
+
+const SubmitButton = ({ children = "Submit" }: { children?: React.ReactNode }) => {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending} className="relative w-full font-semibold">
+      <span className={pending ? "text-transparent" : ""}>{children}</span>
+      {pending && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <LoaderCircle className="h-4 w-4 animate-spin" />
+        </span>
+      )}
+    </Button>
+  );
+};
+
+export default SubmitButton;
