@@ -5,12 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CirclePlus } from "lucide-react";
-
-function fmt(pence: number | null) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-    (pence ?? 0) / 100
-  );
-}
+import { fmt } from "@/lib/utils";
 
 export default async function Dashboard() {
   const pools = await db
@@ -18,7 +13,7 @@ export default async function Dashboard() {
       id: Pools.id,
       name: Pools.name,
       totalAmount: Pools.totalAmount,
-      hostName: Pools.hostName,
+      creatorUsername: Pools.creatorUsername,
       status: Pools.status,
       slug: Pools.slug,
       createdAt: Pools.createdAt,
@@ -81,7 +76,7 @@ export default async function Dashboard() {
                     </Badge>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    Hosted by {pool.hostName} ·{" "}
+                    @{pool.creatorUsername} ·{" "}
                     {new Date(pool.createdAt).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
@@ -90,10 +85,7 @@ export default async function Dashboard() {
                   </span>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="h-1.5 w-32 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full"
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-xs text-muted-foreground">{pct}%</span>
                   </div>

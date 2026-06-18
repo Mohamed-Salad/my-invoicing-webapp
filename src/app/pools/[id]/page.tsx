@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { Pools, Participants, Payments } from "@/db/schema";
+import { Pools } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -18,13 +18,7 @@ import { CopyButton } from "@/components/ui/CopyButton";
 import { addParticipant } from "@/app/actions";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { headers } from "next/headers";
-
-function fmt(pence: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-    pence / 100
-  );
-}
+import { fmt } from "@/lib/utils";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -50,10 +44,8 @@ export default async function PoolDetail({ params }: Props) {
       ? Math.min(100, Math.round((totalCollected / pool.totalAmount) * 100))
       : 0;
 
-  const headersList = await headers();
-  const host = headersList.get("host") ?? "localhost:3000";
-  const protocol = host.includes("localhost") ? "http" : "https";
-  const shareUrl = `${protocol}://${host}/pay/${pool.slug}`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const shareUrl = `${baseUrl}/pay/${pool.slug}`;
 
   const paidNames = new Set(pool.payments.map((p) => p.payerName.toLowerCase().trim()));
   const participantsWithStatus = pool.participants.map((p) => ({
@@ -75,7 +67,7 @@ export default async function PoolDetail({ params }: Props) {
           </Badge>
         </div>
         <p className="text-muted-foreground">
-          Hosted by {pool.hostName} ·{" "}
+          @{pool.creatorUsername} ·{" "}
           {new Date(pool.createdAt).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "long",
@@ -90,16 +82,14 @@ export default async function PoolDetail({ params }: Props) {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Expected", value: fmt(pool.totalAmount) },
-          { label: "Collected", value: fmt(totalCollected), sub: `${pct}%` },
+          { label: "Expected", value: fmt(pool.totalAmount), highlight: false },
+          { label: "Collected", value: fmt(totalCollected), sub: `${pct}%`, highlight: false },
           { label: "Outstanding", value: fmt(outstanding), highlight: outstanding > 0 },
-          { label: "Payments", value: pool.payments.length.toString() },
+          { label: "Payments", value: pool.payments.length.toString(), highlight: false },
         ].map(({ label, value, sub, highlight }) => (
           <div key={label} className="rounded-xl border p-4">
             <div className="text-sm text-muted-foreground mb-1">{label}</div>
-            <div className={`text-xl font-bold ${highlight ? "text-destructive" : ""}`}>
-              {value}
-            </div>
+            <div className={`text-xl font-bold ${highlight ? "text-destructive" : ""}`}>{value}</div>
             {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
           </div>
         ))}
@@ -179,7 +169,7 @@ export default async function PoolDetail({ params }: Props) {
               name="amountOwed"
               type="number"
               step="0.01"
-              min="0"
+              min="0.01"
               placeholder="£"
               className="w-24"
               required

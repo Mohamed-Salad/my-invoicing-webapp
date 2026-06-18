@@ -14,7 +14,7 @@ CREATE TABLE "pools" (
   "description" text,
   "total_amount" integer NOT NULL,
   "per_person_amount" integer,
-  "host_name" text NOT NULL,
+  "creator_username" text NOT NULL,
   "slug" text NOT NULL,
   "status" "pool_status" DEFAULT 'active' NOT NULL,
   "created_at" timestamp DEFAULT now() NOT NULL,

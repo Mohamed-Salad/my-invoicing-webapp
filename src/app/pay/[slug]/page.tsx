@@ -7,12 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { CheckCircle2 } from "lucide-react";
-
-function fmt(pence: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
-    pence / 100
-  );
-}
+import { fmt } from "@/lib/utils";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -49,9 +44,8 @@ export default async function PayPage({ params, searchParams }: Props) {
           <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Payment recorded!</h1>
           <p className="text-muted-foreground">
-            Thanks for chipping in to <span className="font-medium">{pool.name}</span>.
-            <br />
-            {pool.hostName} has been notified.
+            Thanks for chipping in to{" "}
+            <span className="font-medium">{pool.name}</span>.
           </p>
         </div>
       </main>
@@ -64,7 +58,7 @@ export default async function PayPage({ params, searchParams }: Props) {
         <div className="mb-8">
           <p className="text-sm text-muted-foreground mb-1">Payment for</p>
           <h1 className="text-2xl font-bold">{pool.name}</h1>
-          <p className="text-sm text-muted-foreground">Organised by {pool.hostName}</p>
+          <p className="text-sm text-muted-foreground">@{pool.creatorUsername}</p>
           {pool.description && (
             <p className="text-sm text-muted-foreground mt-1">{pool.description}</p>
           )}
@@ -87,12 +81,8 @@ export default async function PayPage({ params, searchParams }: Props) {
               type="number"
               step="0.01"
               min="0.01"
-              placeholder={
-                pool.perPersonAmount ? (pool.perPersonAmount / 100).toFixed(2) : "0.00"
-              }
-              defaultValue={
-                pool.perPersonAmount ? (pool.perPersonAmount / 100).toFixed(2) : ""
-              }
+              placeholder={pool.perPersonAmount ? (pool.perPersonAmount / 100).toFixed(2) : "0.00"}
+              defaultValue={pool.perPersonAmount ? (pool.perPersonAmount / 100).toFixed(2) : ""}
               required
             />
             {pool.perPersonAmount && (

@@ -9,7 +9,7 @@ export const Pools = pgTable('pools', {
   description: text('description'),
   totalAmount: integer('total_amount').notNull(),
   perPersonAmount: integer('per_person_amount'),
-  hostName: text('host_name').notNull(),
+  creatorUsername: text('creator_username').notNull(),
   slug: text('slug').notNull().unique(),
   status: poolStatusEnum('status').default('active').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
